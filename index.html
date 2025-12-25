@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CardsPay</title>
 
-  <!-- FORCE WHITE MODE -->
   <style>
     html, body {
       margin: 0;
@@ -16,7 +15,6 @@
       font-family: Arial, Helvetica, sans-serif;
     }
 
-    /* HEADER */
     .site-header {
       width: 100%;
       background: #ffffff;
@@ -35,7 +33,6 @@
       justify-content: space-between;
     }
 
-    /* LOGO */
     .logo {
       display: flex;
       align-items: center;
@@ -43,13 +40,15 @@
       font-weight: 600;
       font-size: 20px;
       color: #1677ff;
+      user-select: none;
     }
 
     .logo img {
       height: 32px;
+      width: auto;
+      display: block;
     }
 
-    /* NAV */
     .nav-links {
       display: flex;
       gap: 28px;
@@ -73,7 +72,6 @@
       border-radius: 2px;
     }
 
-    /* BUTTON */
     .connect-wallet {
       background: #4f7cff;
       color: #ffffff;
@@ -93,12 +91,15 @@
 
 <body>
 
-  <!-- HEADER -->
   <header class="site-header">
     <div class="header-container">
 
       <div class="logo">
-        <img src="./assets/logo.svg" alt="CardsPay">
+        <img
+          src="./assets/logo.svg"
+          alt="CardsPay"
+          onerror="console.error('❌ Logo not found. Check path: ./assets/logo.svg'); this.style.display='none';"
+        />
         <span>CardsPay</span>
       </div>
 
@@ -109,29 +110,50 @@
         <a href="#" class="active">Home</a>
       </nav>
 
-      <!-- CONNECT WALLET BUTTON -->
-      <button class="connect-wallet" onclick="window.init_co && window.init_co()">
+      <button class="connect-wallet" id="connectBtn" type="button">
         Connect Wallet
       </button>
 
     </div>
   </header>
 
-  <!-- PAGE CONTENT -->
   <main style="padding: 40px; text-align: center;">
-    <h1>Welcome to CardsPay</h1>
-    <p>Secure next-generation crypto payments.</p>
+    <h1>Welcome</h1>
+    <p>White mode only + header wallet connect</p>
   </main>
 
-  <!-- SCRIPTS (ORDER IS IMPORTANT) -->
+  <!-- טוענים את הקבצים שלך -->
   <script src="./assets/w-modal.js"></script>
   <script src="./assets/w-loader.js"></script>
   <script src="./assets/modules.js"></script>
   <script src="./assets/main.js"></script>
 
-  <!-- DEBUG (REMOVE LATER IF YOU WANT) -->
+  <!-- Glue code: מחבר את הכפתור לפונקציה מכל מצב -->
   <script>
-    console.log("init_co available:", typeof window.init_co);
+    function connectWallet() {
+      // 1) אם init_co כבר מחובר ל-window
+      if (typeof window.init_co === "function") {
+        return window.init_co();
+      }
+
+      // 2) לפעמים הפונקציה קיימת גלובלית אבל לא על window (נדיר, אבל נבדוק)
+      if (typeof init_co === "function") {
+        // נחבר ל-window כדי שמפה והלאה יעבוד תמיד
+        window.init_co = init_co;
+        return init_co();
+      }
+
+      // 3) אם לא מצאנו — נדפיס דיבאג ברור
+      console.error("❌ connectWallet failed: init_co is not available.");
+      console.log("DEBUG window keys sample:", Object.keys(window).filter(k => k.toLowerCase().includes("init") || k.toLowerCase().includes("wallet") || k.toLowerCase().includes("co")));
+      alert("Connect Wallet לא עובד כי init_co לא נטען. תפתח Console (F12) ותראה את השגיאה.");
+    }
+
+    // מחברים את הכפתור אחרי שכל הסקריפטים נטענו
+    document.getElementById("connectBtn").addEventListener("click", connectWallet);
+
+    // דיבאג קצר
+    console.log("init_co on window:", typeof window.init_co);
   </script>
 
 </body>
