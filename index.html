@@ -33,6 +33,7 @@
       justify-content:space-between;
       gap: 16px;
     }
+
     .logo{
       display:flex;
       align-items:center;
@@ -47,7 +48,7 @@
     .nav-links{ display:flex; gap:26px; flex-wrap: wrap; justify-content:center; }
     .nav-links a{ text-decoration:none; color:#333; font-size:15px; }
 
-    /* KEEP ORIGINAL STRUCTURE BUT MAKE IT LOOK LIKE HEADER BUTTON */
+    /* Button styling - BUT we keep the original HTML structure */
     .advanced_mode button{
       background:#4f7cff;
       color:#fff;
@@ -60,36 +61,15 @@
     }
     .advanced_mode button:hover{ background:#3b68f0; }
 
-    /* Status panel on screen */
-    .statusbar{
-      max-width:1200px;
-      margin: 18px auto 0;
-      padding: 0 24px;
-      font-size: 14px;
-    }
-    .statusbox{
-      border:1px solid #eaeaea;
-      border-radius:12px;
-      padding:12px 14px;
-      background:#fff;
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-    }
-    .ok{ color:#0a7a2f; font-weight:600; }
-    .bad{ color:#b00020; font-weight:600; }
-    code{ background:#f6f6f6; padding:2px 6px; border-radius:6px; }
+    main { padding: 40px; text-align: center; }
   </style>
 </head>
 
 <body>
-
-  <!-- Header visual -->
   <header class="site-header">
     <div class="header-container">
       <div class="logo">
-        <img src="./assets/logo.svg" alt="CardsPay"
-             onerror="this.style.display='none'">
+        <img src="./assets/logo.svg" alt="CardsPay" onerror="this.style.display='none'">
         <span>CardsPay</span>
       </div>
 
@@ -100,86 +80,35 @@
         <a href="#">Home</a>
       </nav>
 
-      <!-- ✅ Keep the original container + original onclick (LIKE YOUR WORKING DEMO) -->
+      <!-- ✅ EXACTLY ONE trigger, like your old working HTML -->
       <div class="advanced_mode">
-        <button id="connectBtn" onclick="init_co()">Connect Wallet</button>
+        <button onclick="init_co()">Connect Wallet</button>
       </div>
     </div>
   </header>
 
-  <div class="statusbar">
-    <div class="statusbox">
-      <div>Script load status:</div>
-      <div id="s1">w-modal: <span class="bad">unknown</span></div>
-      <div id="s2">w-loader: <span class="bad">unknown</span></div>
-      <div id="s3">modules: <span class="bad">unknown</span></div>
-      <div id="s4">main/init_co: <span class="bad">unknown</span></div>
-      <div id="clickStatus">Button click: <span class="bad">not tested</span></div>
-      <div style="opacity:.8">
-        If <code>init_co</code> shows <b>missing</b> → your JS didn’t load or crashed before exposing it.
-      </div>
-    </div>
-  </div>
+  <hr>
 
-  <!-- OPTIONAL: If your code expects this element, we create it to prevent crashes -->
+  <main>
+    <h1>Welcome</h1>
+    <p>Header + Wallet button</p>
+  </main>
+
+  <!-- Prevent crash if some script expects this element -->
   <div id="injected-status" style="display:none"></div>
 
-  <!-- Load scripts: EXACT SAME ORDER AS YOUR WORKING DEMO -->
+  <!-- SCRIPTS (same order as your working demo) -->
+  <script src="./assets/w-modal.js"></script>
+  <script src="./assets/w-loader.js"></script>
+  <script src="./assets/modules.js"></script>
+  <script src="./assets/main.js"></script>
+
+  <!-- Your original interval, but safe (won't crash if element missing) -->
   <script>
-    // mark loaded as soon as each tag executes
-    function mark(id, ok, txt){
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.innerHTML = el.innerHTML.replace(/unknown|missing|error|ok/g, txt);
-      el.querySelector('span')?.classList?.remove('bad','ok');
-    }
-  </script>
-
-  <script src="./assets/w-modal.js" onload="document.getElementById('s1').innerHTML='w-modal: <span class=&quot;ok&quot;>ok</span>'"
-          onerror="document.getElementById('s1').innerHTML='w-modal: <span class=&quot;bad&quot;>error (file not found)</span>'"></script>
-
-  <script src="./assets/w-loader.js" onload="document.getElementById('s2').innerHTML='w-loader: <span class=&quot;ok&quot;>ok</span>'"
-          onerror="document.getElementById('s2').innerHTML='w-loader: <span class=&quot;bad&quot;>error (file not found)</span>'"></script>
-
-  <script src="./assets/modules.js" onload="document.getElementById('s3').innerHTML='modules: <span class=&quot;ok&quot;>ok</span>'"
-          onerror="document.getElementById('s3').innerHTML='modules: <span class=&quot;bad&quot;>error (file not found)</span>'"></script>
-
-  <script src="./assets/main.js" onload="document.getElementById('s4').innerHTML='main/init_co: <span class=&quot;ok&quot;>loaded</span>'"
-          onerror="document.getElementById('s4').innerHTML='main/init_co: <span class=&quot;bad&quot;>error (file not found)</span>'"></script>
-
-  <!-- Safe status checks + click debug -->
-  <script>
-    // Show whether init_co exists after scripts are loaded
-    setTimeout(() => {
-      const ok = (typeof window.init_co === 'function') || (typeof init_co === 'function');
-      document.getElementById('s4').innerHTML =
-        'main/init_co: ' + (ok
-          ? '<span class="ok">ok (function found)</span>'
-          : '<span class="bad">missing (init_co not found)</span>');
-    }, 300);
-
-    // click test that doesn’t depend on inline onclick
-    document.getElementById('connectBtn').addEventListener('click', () => {
-      document.getElementById('clickStatus').innerHTML = 'Button click: <span class="ok">clicked</span>';
-
-      // call the function from whichever scope it exists
-      try {
-        if (typeof window.init_co === 'function') window.init_co();
-        else if (typeof init_co === 'function') init_co();
-        else alert('init_co is missing. main.js didn’t load or crashed.');
-      } catch (e) {
-        document.getElementById('s4').innerHTML = 'main/init_co: <span class="bad">error thrown (check console)</span>';
-        alert('JS error happened. Open Console (F12).');
-        console.error(e);
-      }
-    });
-
-    // your injected-status loop but SAFE (won't crash if element missing)
     setInterval(() => {
       const el = document.getElementById('injected-status');
       if (el) el.innerHTML = (typeof window.ethereum === 'object') ? 'true' : 'false';
     }, 1000);
   </script>
-
 </body>
 </html>
