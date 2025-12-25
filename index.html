@@ -7,44 +7,77 @@
   <title>CardsPay</title>
 
   <style>
+    /* FORCE WHITE */
     html, body {
       margin: 0;
       padding: 0;
-      background: #ffffff;
-      color: #000000;
+      background: #ffffff !important;
+      color: #000000 !important;
       font-family: Arial, Helvetica, sans-serif;
     }
 
-    /* HEADER VISUAL */
+    /* HEADER */
     .site-header {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
-      height: 64px;
+      height: 68px;
       background: #ffffff;
       border-bottom: 1px solid #eaeaea;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+    }
+
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 0 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 24px;
-      z-index: 1000;
     }
 
     .logo {
-      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
       font-size: 20px;
       color: #1677ff;
     }
 
-    /* 🔥 הכפתור המקורי – רק עיצוב */
-    .advanced_mode {
-      position: fixed;
-      top: 12px;
-      right: 24px;
-      z-index: 1001;
+    .logo img {
+      height: 32px;
+      width: auto;
+      display: block;
     }
 
+    .nav-links {
+      display: flex;
+      gap: 26px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #333;
+      font-size: 15px;
+    }
+
+    /* IMPORTANT:
+       אנחנו לא מזיזים את .advanced_mode ב-DOM,
+       רק "מציירים" אותה בצד ימין של ההדר עם position: fixed
+    */
+    .advanced_mode {
+      position: fixed;
+      top: 14px;          /* בתוך ההדר */
+      right: 24px;        /* צד ימין */
+      z-index: 1001;      /* מעל ההדר */
+    }
+
+    /* עיצוב הכפתור המקורי (הוא נשאר אותו כפתור!) */
     .advanced_mode button {
       background: #4f7cff;
       color: #fff;
@@ -53,43 +86,63 @@
       border-radius: 999px;
       font-size: 14px;
       cursor: pointer;
+      transition: background 0.2s ease;
     }
 
     .advanced_mode button:hover {
       background: #3b68f0;
     }
 
-    main {
-      padding-top: 100px; /* שלא יכנס מתחת ל-header */
-      text-align: center;
+    /* כדי שהתוכן לא ייכנס מתחת להדר */
+    .page-spacer {
+      height: 68px;
     }
   </style>
 </head>
 
 <body>
+  <!-- HEADER VISUAL -->
+  <header class="site-header">
+    <div class="header-container">
+      <div class="logo">
+        <img src="./assets/logo.svg" alt="CardsPay"
+             onerror="console.error('Logo not found: ./assets/logo.svg')">
+        <span>CardsPay</span>
+      </div>
 
-  <!-- HEADER (ויזואלי בלבד) -->
-  <div class="site-header">
-    <div class="logo">CardsPay</div>
-  </div>
+      <nav class="nav-links">
+        <a href="#">About</a>
+        <a href="#">Blog</a>
+        <a href="#">Cards</a>
+        <a href="#">Home</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="page-spacer"></div>
 
   <hr>
 
-  <!-- ❗ הכפתור נשאר בדיוק במקום המקורי -->
+  <!-- ✅ נשאר בדיוק כמו בדוגמה שלך -->
   <div class="advanced_mode">
     <button onclick="init_co()">Connect Wallet</button>
   </div>
 
-  <main>
-    <h1>Wallet works</h1>
-    <p>Button logic untouched</p>
-  </main>
-
-  <!-- SCRIPTS – אותו סדר כמו בדוגמה שעובדת -->
+  <!-- הסקריפטים שלך - אותו סדר -->
   <script src="./assets/w-modal.js"></script>
   <script src="./assets/w-loader.js"></script>
   <script src="./assets/modules.js"></script>
   <script src="./assets/main.js"></script>
 
+  <!-- אם injected-status לא קיים אצלך, זה עלול לזרוק שגיאה ולעצור JS.
+       לכן שמתי בדיקה שמונעת קריסה. -->
+  <script>
+    setInterval(() => {
+      const el = document.getElementById('injected-status');
+      if (el) {
+        el.innerHTML = (typeof window.ethereum === 'object') ? 'true' : 'false';
+      }
+    }, 1000);
+  </script>
 </body>
 </html>
